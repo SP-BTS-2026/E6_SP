@@ -41,7 +41,7 @@
                 </div>
             <?php endif; ?>
 
-            <form action="index.php?page=panier" method="POST" class="form-resa">
+            <form action="index.php?page=ajout_panier" method="POST" class="form-resa">
                 <input type="hidden" name="id_appart" value="<?= $unAppart['id_appart'] ?>">
                 
                 <div class="input-group">

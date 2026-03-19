@@ -1,74 +1,74 @@
 <div class="container profil-container">
+ 
+    <!-- CARTE PROFIL -->
     <div class="profil-header-card">
         <div class="user-info">
             <div class="user-avatar">
-                <span>JD</span>
+                <?= strtoupper(substr($user['prenom'], 0, 1) . substr($user['nom'], 0, 1)); ?>
             </div>
             <div class="user-text">
-                <h1>Jean Dupont</h1>
-                <p class="user-email">jean.dupont@email.com</p>
-                <span class="user-badge">Client Privilège</span>
-            </div>
-        </div>
-        <div class="user-stats">
-            <div class="stat-item">
-                <span class="stat-value">3</span>
-                <span class="stat-label">Locations</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-value">12</span>
-                <span class="stat-label">Jours skiés</span>
+                <h1><?= htmlspecialchars($user['prenom'] . ' ' . $user['nom']); ?></h1>
+                <p class="user-email"><i class="fas fa-envelope" style="color:#c9a84c;margin-right:5px;"></i><?= htmlspecialchars($user['email']); ?></p>
+                <?php if(!empty($user['tel'])): ?>
+                <p class="user-email" style="margin-top:4px;"><i class="fas fa-phone" style="color:#4a90c4;margin-right:5px;"></i><?= htmlspecialchars($user['tel']); ?></p>
+                <?php endif; ?>
             </div>
         </div>
     </div>
-
+ 
+    <!-- HISTORIQUE -->
     <div class="historique-section">
-        <div class="section-header">
-            <h2>Historique de mes réservations</h2>
-            <div class="filter-pills">
-                <span class="pill active">Tout</span>
-                <span class="pill">Appartements</span>
-                <span class="pill">Matériel</span>
-            </div>
-        </div>
-
+        <h2><i class="fas fa-history" style="color:#c9a84c;margin-right:10px;"></i>Historique des réservations</h2>
+ 
+        <?php if(empty($historique)): ?>
+            <p style="color:#8a9bb0;text-align:center;padding:40px;">Aucune réservation validée pour le moment.</p>
+        <?php else: ?>
         <table class="profil-table">
             <thead>
                 <tr>
                     <th>Type</th>
-                    <th>Nom / Désignation</th>
-                    <th>Début</th>
-                    <th>Fin</th>
+                    <th>Désignation</th>
+                    <th>Arrivée</th>
+                    <th>Départ</th>
                     <th>Montant</th>
                     <th>Statut</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
+                <?php foreach($historique as $resa): ?>
                 <tr>
-                    <td><i class="icon">🏠</i> Appart'</td>
-                    <td><strong>Chalet "Le Marmoton"</strong></td>
-                    <td>12 Janv. 2024</td>
-                    <td>19 Janv. 2024</td>
-                    <td>850,00 €</td>
-                    <td><span class="status-done">Terminé</span></td>
+                    <td><?= ($resa['type'] == 'Appart') ? '🏠 Appart' : '🎿 Matériel'; ?></td>
+                    <td><strong><?= htmlspecialchars($resa['designation']); ?></strong></td>
+                    <td><?= date('d/m/Y', strtotime($resa['date_debut'])); ?></td>
+                    <td><?= date('d/m/Y', strtotime($resa['date_fin'])); ?></td>
+                    <td>
+                        <?php if(!is_null($resa['montant'])): ?>
+                            <strong><?= number_format($resa['montant'], 2, ',', ' '); ?> €</strong>
+                        <?php else: ?>
+                            <span style="color:#8a9bb0;">—</span>
+                        <?php endif; ?>
+                    </td>
+                    <td>
+                        <!-- FIX : on utilise libelle_statut et non statut -->
+                        <span class="status-<?= ($resa['libelle_statut'] == 'Termine') ? 'done' : 'pending'; ?>">
+                            <?= ($resa['libelle_statut'] == 'Termine') ? '✓ Terminé' : '⏳ En attente'; ?>
+                        </span>
+                    </td>
+                    <td>
+                        <?php if ($resa['libelle_statut'] == 'Termine' && !empty($resa['num_facture'])): ?>
+                            <a href="index.php?page=facture&id=<?= $resa['id_reser']; ?>"
+                               style="color:#1e4d7b;text-decoration:none;font-weight:600;font-size:0.88rem;">
+                                <i class="fas fa-file-invoice"></i> Facture
+                            </a>
+                        <?php else: ?>
+                            <span style="color:#c0c8d0;font-size:0.85rem;">—</span>
+                        <?php endif; ?>
+                    </td>
                 </tr>
-                <tr>
-                    <td><i class="icon">🎿</i> Matériel</td>
-                    <td><strong>Pack Ski Premium (Rossignol)</strong></td>
-                    <td>12 Janv. 2024</td>
-                    <td>19 Janv. 2024</td>
-                    <td>145,00 €</td>
-                    <td><span class="status-done">Terminé</span></td>
-                </tr>
-                <tr>
-                    <td><i class="icon">🏠</i> Appart'</td>
-                    <td><strong>Studio "Soleil d'Or"</strong></td>
-                    <td>15 Mars 2024</td>
-                    <td>22 Mars 2024</td>
-                    <td>420,00 €</td>
-                    <td><span class="status-pending">À venir</span></td>
-                </tr>
+                <?php endforeach; ?>
             </tbody>
         </table>
+        <?php endif; ?>
     </div>
 </div>
