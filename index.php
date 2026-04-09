@@ -2,14 +2,14 @@
     session_start();
     require_once("Controleur/controleur.class.php");
     $unControleur = new Controleur();
- 
+
     $page = (isset($_GET['page'])) ? $_GET['page'] : 'accueil';
- 
+
     switch($page) {
         case 'accueil':
             $appartementsVedettes = $unControleur->getAppartementsVedettes();
             break;
- 
+
         case 'connexion':
             if (isset($_POST['btnConnexion'])) {
                 $email = $_POST['email'];
@@ -17,6 +17,7 @@
                 $user  = $unControleur->login($email, $mdp);
                 if ($user) {
                     $_SESSION['id_user'] = $user['id_perso'];
+                    $_SESSION['role']    = $user['role'];
                     header('Location: index.php?page=accueil');
                     exit();
                 } else {
@@ -24,15 +25,15 @@
                 }
             }
             break;
- 
+
         case 'detail':
             $unAppart = (isset($_GET['id'])) ? $unControleur->getAppartement($_GET['id']) : null;
             break;
- 
+
         case 'appartements':
             $appartements = $unControleur->afficherCatalogue();
             break;
- 
+
         case 'ajout_panier':
             if(isset($_POST['id_appart'], $_POST['date_debut'], $_POST['date_fin'])) {
                 $unControleur->ajouterAuPanier($_SESSION['id_user'], $_POST['id_appart'], $_POST['date_debut'], $_POST['date_fin']);
@@ -40,7 +41,7 @@
                 exit();
             }
             break;
- 
+
         case 'panier':
             if (isset($_GET['action']) && $_GET['action'] == 'supprimer' && isset($_GET['id_reser'])) {
                 $unControleur->supprimerReservation($_GET['id_reser']);
@@ -49,15 +50,15 @@
             }
             $lesReservations = $unControleur->getPanierByClient($_SESSION['id_user']);
             break;
- 
+
         case 'profil':
             $user       = $unControleur->getUserById($_SESSION['id_user']);
             $historique = $unControleur->getHistorique($_SESSION['id_user']);
             break;
- 
+
         case 'valider_resa':
             if(isset($_POST['id_reser']) && isset($_POST['montant'])) {
-                $lesIds       = $_POST['id_reser']; // tableau id_reser[]
+                $lesIds       = $_POST['id_reser'];
                 $montantTotal = $_POST['montant'];
                 $unControleur->validerReservationEtFacturer($lesIds, $montantTotal);
                 $_SESSION['panier'] = array();
@@ -65,13 +66,68 @@
                 exit();
             }
             break;
- 
+
         case 'facture':
-            // On recupere la facture via l'id de reservation
             $id_reser  = isset($_GET['id']) ? (int)$_GET['id'] : 0;
             $laFacture = $unControleur->getFacture($id_reser);
             break;
- 
+
+        /* =========================================
+           CRUD PROPRIETAIRE
+           ========================================= */
+
+        case 'mes_apparts':
+            if(!isset($_SESSION['id_user'])) { header('Location: index.php?page=connexion'); exit(); }
+            $mesApparts = $unControleur->getAppartsByProprio($_SESSION['id_user']);
+            break;
+
+        case 'ajout_appart':
+            if(!isset($_SESSION['id_user'])) { header('Location: index.php?page=connexion'); exit(); }
+            if(isset($_POST['btnAjout'])) {
+                $data = [
+                    'num_appart'       => $_POST['num_appart'],
+                    'type_appart'      => $_POST['type_appart'],
+                    'surface'          => $_POST['surface'],
+                    'capacite_accueil' => $_POST['capacite_accueil'],
+                    'exposition'       => $_POST['exposition'],
+                    'distance_pistes'  => $_POST['distance_pistes'],
+                    'prix_hebdo'       => $_POST['prix_hebdo'],
+                    'image'            => $_POST['image'] ?: 'default.jpg',
+                    'id_proprio'       => $_SESSION['id_user']
+                ];
+                $unControleur->ajouterAppartement($data);
+                header('Location: index.php?page=mes_apparts&success=ajout');
+                exit();
+            }
+            break;
+
+        case 'modif_appart':
+            if(!isset($_SESSION['id_user'])) { header('Location: index.php?page=connexion'); exit(); }
+            $unAppart = $unControleur->getAppartement($_GET['id']);
+            if(isset($_POST['btnModif'])) {
+                $data = [
+                    'num_appart'       => $_POST['num_appart'],
+                    'type_appart'      => $_POST['type_appart'],
+                    'surface'          => $_POST['surface'],
+                    'capacite_accueil' => $_POST['capacite_accueil'],
+                    'exposition'       => $_POST['exposition'],
+                    'distance_pistes'  => $_POST['distance_pistes'],
+                    'prix_hebdo'       => $_POST['prix_hebdo'],
+                    'image'            => $_POST['image'] ?: 'default.jpg',
+                    'id_proprio'       => $_SESSION['id_user']
+                ];
+                $unControleur->modifierAppartement($_GET['id'], $data);
+                header('Location: index.php?page=mes_apparts&success=modif');
+                exit();
+            }
+            break;
+
+        case 'suppr_appart':
+            if(!isset($_SESSION['id_user'])) { header('Location: index.php?page=connexion'); exit(); }
+            $unControleur->supprimerAppartement($_GET['id'], $_SESSION['id_user']);
+            header('Location: index.php?page=mes_apparts&success=supprime');
+            exit();
+
         case 'deconnexion':
             session_unset();
             session_destroy();
@@ -89,7 +145,7 @@
     <link rel="stylesheet" href="Style/style_index.css">
 </head>
 <body>
- 
+
     <?php if ($page != 'connexion' && $page != 'inscription'): ?>
         <?php require_once("Vue/vue_header.php"); ?>
         <section class="hero-container">
@@ -98,7 +154,7 @@
             </a>
         </section>
     <?php endif; ?>
- 
+
     <main>
         <?php
             $file = "Vue/vue_" . $page . ".php";
@@ -113,6 +169,6 @@
             }
         ?>
     </main>
- 
+
 </body>
 </html>
