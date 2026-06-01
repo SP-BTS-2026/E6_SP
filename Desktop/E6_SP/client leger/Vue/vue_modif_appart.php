@@ -17,8 +17,7 @@
             <div class="alert-error"><i class="fas fa-exclamation-circle"></i> <?= $erreur ?></div>
         <?php endif; ?>
 
-        <form method="POST" action="index.php?page=modif_appart&id=<?= $unAppart['id_appart'] ?>">
-            <div class="form-grid">
+<form method="POST" action="index.php?page=modif_appart&id=<?= $unAppart['id_appart'] ?>" enctype="multipart/form-data">            <div class="form-grid">
                 <div class="form-group">
                     <label>Numéro d'appartement</label>
                     <input type="text" name="num_appart" required value="<?= htmlspecialchars($unAppart['num_appart']) ?>">
@@ -60,9 +59,13 @@
                     <input type="number" name="prix_hebdo" step="0.01" required value="<?= $unAppart['prix_hebdo'] ?>">
                 </div>
                 <div class="form-group">
-                    <label>Nom de l'image</label>
-                    <input type="text" name="image" value="<?= htmlspecialchars($unAppart['image']) ?>">
-                </div>
+    <label>Photo de l'appartement</label>
+    <img src="images/chalets/<?= htmlspecialchars($unAppart['image']) ?>" 
+         style="width:100%;border-radius:8px;margin-bottom:8px;"
+         onerror="this.style.display='none'">
+    <small style="color:#777;">Laisser vide pour garder l'image actuelle</small>
+    <input type="file" name="image" accept="image/*">
+</div>
             </div>
 
             <button type="submit" name="btnModif" class="btn-submit">

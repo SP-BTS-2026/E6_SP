@@ -168,5 +168,31 @@ class Modele {
         $stmt->execute(['id_reser' => $id_reser]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+    public function getAppartsByProprio($id_proprio) {
+    $sql  = "SELECT * FROM APPARTEMENT WHERE id_proprio = ? ORDER BY id_appart DESC";
+    $stmt = $this->pdo->prepare($sql);
+    $stmt->execute([$id_proprio]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+public function ajouterAppartement($data) {
+    $sql = "INSERT INTO APPARTEMENT (num_appart, type_appart, surface, capacite_accueil, exposition, distance_pistes, prix_hebdo, image, id_proprio)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $stmt = $this->pdo->prepare($sql);
+    return $stmt->execute([$data['num_appart'], $data['type_appart'], $data['surface'], $data['capacite_accueil'], $data['exposition'], $data['distance_pistes'], $data['prix_hebdo'], $data['image'], $data['id_proprio']]);
+}
+
+public function modifierAppartement($id_appart, $data) {
+    $sql = "UPDATE APPARTEMENT SET num_appart=?, type_appart=?, surface=?, capacite_accueil=?, exposition=?, distance_pistes=?, prix_hebdo=?, image=?
+            WHERE id_appart = ? AND id_proprio = ?";
+    $stmt = $this->pdo->prepare($sql);
+    return $stmt->execute([$data['num_appart'], $data['type_appart'], $data['surface'], $data['capacite_accueil'], $data['exposition'], $data['distance_pistes'], $data['prix_hebdo'], $data['image'], $id_appart, $data['id_proprio']]);
+}
+
+public function supprimerAppartement($id_appart, $id_proprio) {
+    $sql  = "DELETE FROM APPARTEMENT WHERE id_appart = ? AND id_proprio = ?";
+    $stmt = $this->pdo->prepare($sql);
+    return $stmt->execute([$id_appart, $id_proprio]);
+}
 }
 ?>

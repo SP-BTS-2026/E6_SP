@@ -11,19 +11,20 @@
             break;
  
         case 'connexion':
-            if (isset($_POST['btnConnexion'])) {
-                $email = $_POST['email'];
-                $mdp   = $_POST['mdp'];
-                $user  = $unControleur->login($email, $mdp);
-                if ($user) {
-                    $_SESSION['id_user'] = $user['id_perso'];
-                    header('Location: index.php?page=accueil');
-                    exit();
-                } else {
-                    $erreur = "Identifiants incorrects.";
-                }
-            }
-            break;
+    if (isset($_POST['btnConnexion'])) {
+        $email = $_POST['email'];
+        $mdp   = $_POST['mdp'];
+        $user  = $unControleur->login($email, $mdp);
+        if ($user) {
+            $_SESSION['id_user'] = $user['id_perso'];
+            $_SESSION['role']    = $user['role'];
+            header('Location: index.php?page=accueil');
+            exit();
+        } else {
+            $erreur = "Identifiants incorrects.";
+        }
+    }
+    break;
  
         case 'detail':
             $unAppart = (isset($_GET['id'])) ? $unControleur->getAppartement($_GET['id']) : null;
@@ -71,6 +72,69 @@
             $id_reser  = isset($_GET['id']) ? (int)$_GET['id'] : 0;
             $laFacture = $unControleur->getFacture($id_reser);
             break;
+            case 'mes_apparts':
+    if(!isset($_SESSION['id_user'])) { header('Location: index.php?page=connexion'); exit(); }
+    $mesApparts = $unControleur->getAppartsByProprio($_SESSION['id_user']);
+    break;
+
+case 'modif_appart':
+    if(!isset($_SESSION['id_user'])) { header('Location: index.php?page=connexion'); exit(); }
+    $unAppart = $unControleur->getAppartement($_GET['id']);
+    if(isset($_POST['btnModif'])) {
+        $nomImage = $unAppart['image']; // on garde l'ancienne par défaut
+        if(isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
+            $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+            $nomImage = uniqid('appart_') . '.' . $ext;
+            move_uploaded_file($_FILES['image']['tmp_name'], 'images/chalets/' . $nomImage);
+        }
+        $data = [
+            'num_appart'       => $_POST['num_appart'],
+            'type_appart'      => $_POST['type_appart'],
+            'surface'          => $_POST['surface'],
+            'capacite_accueil' => $_POST['capacite_accueil'],
+            'exposition'       => $_POST['exposition'],
+            'distance_pistes'  => $_POST['distance_pistes'],
+            'prix_hebdo'       => $_POST['prix_hebdo'],
+            'image'            => $nomImage,
+            'id_proprio'       => $_SESSION['id_user']
+        ];
+        $unControleur->modifierAppartement($_GET['id'], $data);
+        header('Location: index.php?page=mes_apparts&success=modif');
+        exit();
+    }
+    break;
+
+case 'ajout_appart':
+    if(!isset($_SESSION['id_user'])) { header('Location: index.php?page=connexion'); exit(); }
+    if(isset($_POST['btnAjout'])) {
+        $nomImage = 'default.jpg';
+        if(isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
+            $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+            $nomImage = uniqid('appart_') . '.' . $ext;
+            move_uploaded_file($_FILES['image']['tmp_name'], 'images/chalets/' . $nomImage);
+        }
+        $data = [
+            'num_appart'       => $_POST['num_appart'],
+            'type_appart'      => $_POST['type_appart'],
+            'surface'          => $_POST['surface'],
+            'capacite_accueil' => $_POST['capacite_accueil'],
+            'exposition'       => $_POST['exposition'],
+            'distance_pistes'  => $_POST['distance_pistes'],
+            'prix_hebdo'       => $_POST['prix_hebdo'],
+            'image'            => $nomImage,
+            'id_proprio'       => $_SESSION['id_user']
+        ];
+        $unControleur->ajouterAppartement($data);
+        header('Location: index.php?page=mes_apparts&success=ajout');
+        exit();
+    }
+    break;
+
+case 'suppr_appart':
+    if(!isset($_SESSION['id_user'])) { header('Location: index.php?page=connexion'); exit(); }
+    $unControleur->supprimerAppartement($_GET['id'], $_SESSION['id_user']);
+    header('Location: index.php?page=mes_apparts&success=supprime');
+    exit();
  
         case 'deconnexion':
             session_unset();

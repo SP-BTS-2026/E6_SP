@@ -13,8 +13,7 @@
             <div class="alert-error"><i class="fas fa-exclamation-circle"></i> <?= $erreur ?></div>
         <?php endif; ?>
 
-        <form method="POST" action="index.php?page=ajout_appart">
-            <div class="form-grid">
+<form method="POST" action="index.php?page=ajout_appart" enctype="multipart/form-data">            <div class="form-grid">
                 <div class="form-group">
                     <label>Numéro d'appartement</label>
                     <input type="text" name="num_appart" required placeholder="Ex: A12">
@@ -60,9 +59,9 @@
                     <input type="number" name="prix_hebdo" step="0.01" required placeholder="Ex: 650.00">
                 </div>
                 <div class="form-group">
-                    <label>Nom de l'image</label>
-                    <input type="text" name="image" placeholder="Ex: appart12.jpg" value="default.jpg">
-                </div>
+    <label>Photo de l'appartement</label>
+    <input type="file" name="image" accept="image/*">
+</div>
             </div>
 
             <button type="submit" name="btnAjout" class="btn-submit">
