@@ -1,0 +1,15 @@
+=========================================
+             NEIGE & SOLEIL              
+=========================================
+ Facture de la Réservation N° : 13
+-----------------------------------------
+ Client : Ismael AMINOU
+ Hébergement : Studio
+ Durée du séjour : 4 nuits (450.0€/nuit)
+-----------------------------------------
+ Montant Total HT : 1800.0 €
+ TVA (20%)        : 360.0 €
+ TOTAL À PAYER TTC : 2160.0 €
+=========================================
+ Statut de la facture : PAYÉ
+ Merci de votre confiance !
