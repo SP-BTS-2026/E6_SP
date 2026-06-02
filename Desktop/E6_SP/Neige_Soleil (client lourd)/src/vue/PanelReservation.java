@@ -195,29 +195,52 @@ public class PanelReservation extends PanelPrincipal implements ActionListener {
         txtDateDebut.setText("");
         txtDateFin.setText("");
         txtNbPers.setText("");
-        cbClient.setSelectedIndex(0);
-        cbAppart.setSelectedIndex(0);
-        cbEmploye.setSelectedIndex(0);
+        
+        // CORRECTION : évite de forcer l'index 0 si la liste est vide
+        if (cbClient.getItemCount() > 0) cbClient.setSelectedIndex(0);
+        if (cbAppart.getItemCount() > 0) cbAppart.setSelectedIndex(0);
+        if (cbEmploye.getItemCount() > 0) cbEmploye.setSelectedIndex(0);
 
         btModifier.setEnabled(false);
         btSupprimer.setEnabled(false);
     }
 
     public void insertReservation() {
+        // 1. Sécurité : On vérifie que les champs textes ne sont pas vides
+        if (txtDateDebut.getText().equals("") || txtDateFin.getText().equals("") || txtNbPers.getText().equals("")) {
+            JOptionPane.showMessageDialog(this, "Veuillez remplir toutes les dates et le nombre de personnes.");
+            return;
+        }
 
-        String dd = txtDateDebut.getText();
-        String df = txtDateFin.getText();
-        int nb = Integer.parseInt(txtNbPers.getText());
+        // 2. Sécurité : On vérifie qu'un élément est bien sélectionné dans CHAQUE liste déroulante
+        if (cbClient.getSelectedItem() == null || cbAppart.getSelectedItem() == null || cbEmploye.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(this, "Erreur : Assurez-vous d'avoir des clients, des appartements et des employés dans la base, et de les sélectionner.");
+            return; // Bloque le NullPointerException !
+        }
 
-        int id_client = Integer.parseInt(cbClient.getSelectedItem().toString().split("-")[0]);
-        int id_appart = Integer.parseInt(cbAppart.getSelectedItem().toString().split("-")[0]);
-        int id_employe = Integer.parseInt(cbEmploye.getSelectedItem().toString().split("-")[0]);
+        try {
+            String dd = txtDateDebut.getText();
+            String df = txtDateFin.getText();
+            int nb = Integer.parseInt(txtNbPers.getText());
 
-        Reservation r = new Reservation(dd, df, nb, id_client, id_appart, id_employe);
+            // Extraction sécurisée des identifiants
+            int id_client = Integer.parseInt(cbClient.getSelectedItem().toString().split("-")[0]);
+            int id_appart = Integer.parseInt(cbAppart.getSelectedItem().toString().split("-")[0]);
+            int id_employe = Integer.parseInt(cbEmploye.getSelectedItem().toString().split("-")[0]);
 
-        Controleur.insertReservation(r);
-        unTableau.setDonnees(obtenirDonnees(""));
-        vider();
+            Reservation r = new Reservation(dd, df, nb, id_client, id_appart, id_employe);
+
+            Controleur.insertReservation(r);
+            unTableau.setDonnees(obtenirDonnees(""));
+            vider();
+            
+            JOptionPane.showMessageDialog(this, "Réservation ajoutée avec succès !");
+
+        } catch (NumberFormatException nfe) {
+            JOptionPane.showMessageDialog(this, "Erreur : Le nombre de personnes doit être un chiffre valide.");
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Erreur lors de l'insertion : " + ex.getMessage());
+        }
     }
 
     public void updateReservation() {

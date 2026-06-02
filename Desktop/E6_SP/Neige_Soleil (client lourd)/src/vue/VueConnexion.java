@@ -25,7 +25,7 @@ public class VueConnexion extends JFrame implements ActionListener, KeyListener
 {
 	
 	private JPanel panelForm = new JPanel();
-	private JTextField txtEmail = new JTextField("imdad@gmail.com");
+	private JTextField txtEmail = new JTextField("jean@mail.com");
 	private JPasswordField txtMdp = new JPasswordField("123");
 	private JButton btAnnuler = new JButton("Annuler");
 	private JButton btValider = new JButton("Valider");
@@ -113,8 +113,8 @@ public class VueConnexion extends JFrame implements ActionListener, KeyListener
 				
 				//On lui ouvre le logiciel 
 				Neige_soleil.rendreVisibleVueConnexion(false);
-				Neige_soleil.creerDetruireVueGenerale(true);
-				
+				// Modifie cette ligne :
+				Neige_soleil.creerDetruireVueGenerale(true, unUser);				
 				
 			}
 			

@@ -1,236 +1,167 @@
 package vue;
 
 import java.awt.Color;
-import java.awt.GridLayout;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
 
-import controleur.Appartement;
- 
+// Importation des classes nécessaires depuis les autres packages
 import controleur.Controleur;
 import controleur.Materiel;
-import controleur.Tableau;
 
 public class PanelMateriels extends PanelPrincipal implements ActionListener {
 
-    private JPanel panelForm = new JPanel();
+    // Éléments du formulaire (Gauche)
+    private JLabel lbLibelle = new JLabel("Nom du matériel :");
+    private JLabel lbType = new JLabel("Type de matériel :");
+    private JLabel lbEtat = new JLabel("État du matériel :");
+    private JLabel lbPrix = new JLabel("Prix du jour :");
 
-    private JTextField txtLibelle = new JTextField();
-    private JTextField txtType = new JTextField();
-    private JTextField txtEtat = new JTextField();
-    private JTextField txtPrix = new JTextField();
-    private static JComboBox<String> txtMat = new JComboBox<String>();
+    private JTextField tfLibelle = new JTextField();
+    private JTextField tfPrix = new JTextField();
 
+    private JComboBox<String> cbType = new JComboBox<>(new String[]{"Ski", "Snowboard", "Chaussures", "Casque", "Luge"});
+    private JComboBox<String> cbEtat = new JComboBox<>(new String[]{"Neuf", "Excellent", "Bon état", "Usagé"});
 
     private JButton btAnnuler = new JButton("Annuler");
     private JButton btValider = new JButton("Valider");
     private JButton btSupprimer = new JButton("Supprimer");
     private JButton btModifier = new JButton("Modifier");
 
-    private JPanel panelFiltre = new JPanel();
-    private JTextField txtFiltre = new JTextField();
-    private JButton btFiltrer = new JButton("Filtrer");
-
-    private JTable tableMateriel;
-    private JScrollPane scrollMateriel;
-    private Tableau unTableau;
+    // Éléments du Tableau (Droite)
+    private JTable tableMateriels;
+    private DefaultTableModel modelTable;
+    private JScrollPane scrollTable;
 
     public PanelMateriels(String titre) {
         super(titre);
 
-        // panel filtre
-        panelFiltre.setBounds(450,80,460,30);
-        panelFiltre.setBackground(Color.gray);
-        panelFiltre.setLayout(new GridLayout(1,3,10,10));
-        panelFiltre.add(new JLabel("Filtrer : "));
-        panelFiltre.add(txtFiltre);
-        panelFiltre.add(btFiltrer);
-        add(panelFiltre);
+        // --- POSITIONNEMENT FORMULAIRE (CÔTÉ GAUCHE) ---
+        lbLibelle.setBounds(50, 150, 130, 25);
+        tfLibelle.setBounds(180, 150, 150, 25);
 
-        // panel formulaire
-        panelForm.setBounds(50,100,300,350);
-        panelForm.setBackground(Color.gray);
-        panelForm.setLayout(new GridLayout(9,2,10,10));
+        lbType.setBounds(50, 200, 130, 25);
+        cbType.setBounds(180, 200, 150, 25);
 
-        panelForm.add(new JLabel("Libelle materiel:"));
-        panelForm.add(txtLibelle);
+        lbEtat.setBounds(50, 250, 130, 25);
+        cbEtat.setBounds(180, 250, 150, 25);
 
-        panelForm.add(new JLabel("Type materiel:"));
-        panelForm.add(txtType);
+        lbPrix.setBounds(50, 300, 130, 25);
+        tfPrix.setBounds(180, 300, 150, 25);
 
-        panelForm.add(new JLabel("Etat materiel :"));
-        panelForm.add(txtEtat);
+        btAnnuler.setBounds(50, 360, 120, 30);
+        btValider.setBounds(180, 360, 120, 30);
+        btSupprimer.setBounds(50, 410, 120, 30);
+        btModifier.setBounds(180, 410, 120, 30);
 
-        panelForm.add(new JLabel("Prix materiel :"));
-        panelForm.add(txtPrix);
+        // --- POSITIONNEMENT TABLEAU (CÔTÉ DROIT) ---
+        String[] colonnes = {"ID mat", "Libelle mat", "Type mat", "Etat", "Prix_jour"};
         
+        modelTable = new DefaultTableModel(colonnes, 0);
+        tableMateriels = new JTable(modelTable);
         
-        panelForm.add(new JLabel("id_mat :"));
-        panelForm.add(txtMat);
+        scrollTable = new JScrollPane(tableMateriels);
+        scrollTable.setBounds(400, 150, 500, 300);
 
+        // --- AJOUT DES COMPOSANTS ---
+        this.add(lbLibelle);
+        this.add(tfLibelle);
+        this.add(lbType);
+        this.add(cbType);
+        this.add(lbEtat);
+        this.add(cbEtat);
+        this.add(lbPrix);
+        this.add(tfPrix);
         
+        this.add(btAnnuler);
+        this.add(btValider);
+        this.add(btSupprimer);
+        this.add(btModifier);
         
+        this.add(scrollTable);
 
-        panelForm.add(btAnnuler);
-        panelForm.add(btValider);
-        panelForm.add(btSupprimer);
-        panelForm.add(btModifier);
-
-        btSupprimer.setEnabled(true);
-        btModifier.setEnabled(true);
-
-        add(panelForm);
-
+        // Écouteurs
         btAnnuler.addActionListener(this);
         btValider.addActionListener(this);
-        btModifier.addActionListener(this);
         btSupprimer.addActionListener(this);
-        btFiltrer.addActionListener(this);
-        txtFiltre.addActionListener(this);
-
-        String entetes[] = {"ID", "Libelle", "Type", "Etat", "Prix","id_mat"};
-
-        unTableau = new Tableau(obtenirDonnees(""), entetes);
-        tableMateriel = new JTable(unTableau);
-
-        scrollMateriel = new JScrollPane(tableMateriel);
-        scrollMateriel.setBounds(450,120,450,260);
-        add(scrollMateriel);
-
-        tableMateriel.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                int i = tableMateriel.getSelectedRow();
-
-                txtLibelle.setText(unTableau.getValueAt(i,1).toString());
-                txtType.setText(unTableau.getValueAt(i,2).toString());
-                txtEtat.setText(unTableau.getValueAt(i,3).toString());
-                txtPrix.setText(unTableau.getValueAt(i,4).toString());
-             
-
-                btModifier.setEnabled(true);
-                btSupprimer.setEnabled(true);
-            }
-        });
-        remplirIdMat();
-    }
-
-    public Object[][] obtenirDonnees(String filtre){
-        ArrayList<Materiel> lesMateriels = Controleur.selectAllMateriels(filtre);
-        Object[][] mat = new Object[lesMateriels.size()][5];
-
-        int i=0;
-        for(Materiel m : lesMateriels){
-            mat[i][0]=m.getId_mat();
-            mat[i][1]=m.getLibelle_mat();
-            mat[i][2]=m.getType_mat();
-            mat[i][3]=m.getEtat();
-            mat[i][4]=m.getPrix_jour();
-            mat[i][5]=m.getId_mat();
-            
-           
-            
-            i++;
-        }
-        return mat;
-    }
-
-    public void actionPerformed(ActionEvent e) {
-
-        if(e.getSource()==btAnnuler){
-            vider();
-        }
-
-        else if(e.getSource()==btValider){
-            insertMateriel();
-        }
-
-        else if(e.getSource()==btModifier){
-            updateMateriel();
-        }
-
-        else if(e.getSource()==btSupprimer){
-            deleteMateriel();
-        }
-
-        else if(e.getSource()==btFiltrer || e.getSource()==txtFiltre){
-            unTableau.setDonnees(obtenirDonnees(txtFiltre.getText()));
-        }
-    }
-
-    public void vider(){
-        txtLibelle.setText("");
-        txtType.setText("");
-        txtEtat.setText("");
-        txtPrix.setText("");
-     
-        btModifier.setEnabled(false);
-        btSupprimer.setEnabled(false);
+        btModifier.addActionListener(this);
         
+        // Remplir le tableau avec les vraies données au démarrage
+        remplirTableau();
     }
 
-    public void insertMateriel(){
+    private void remplirTableau() {
+        modelTable.setRowCount(0);
 
-        if(txtLibelle.getText().equals("") || txtType.getText().equals("") || txtEtat.getText().equals("") || txtPrix.getText().equals("")){
-            JOptionPane.showMessageDialog(this,"Veuillez remplir tous les champs");
-            return;
-        }
+        try {
+            ArrayList<Materiel> lesMateriels = Controleur.selectAllMateriels("");
 
-        Materiel m = new Materiel(
-                txtLibelle.getText(),
-                txtType.getText(),
-                txtEtat.getText(),
-                Float.parseFloat(txtPrix.getText()),
-                Integer.parseInt(txtMat.getSelectedItem().toString())
-        );
-
-
-        Controleur.insertMateriel(m);
-        unTableau.setDonnees(obtenirDonnees(""));
-        vider();
-    }
-
-
-    public void updateMateriel(){
-
-        int i = tableMateriel.getSelectedRow();
-        int id = Integer.parseInt(unTableau.getValueAt(i,0).toString());
-
-        Materiel m = new Materiel(
-                id,
-                txtLibelle.getText(),
-                txtType.getText(),
-                txtEtat.getText(),
-                Float.parseFloat(txtPrix.getText()),
-                Integer.parseInt(txtMat.getSelectedItem().toString())
-        );
-
-        Controleur.updateMateriel(m);
-        unTableau.setDonnees(obtenirDonnees(""));
-        vider();
-    }
-
-    public void deleteMateriel(){
-
-        int i = tableMateriel.getSelectedRow();
-        int id = Integer.parseInt(unTableau.getValueAt(i,0).toString());
-
-        int r = JOptionPane.showConfirmDialog(this,"Supprimer materiel ?");
-
-        if(r==0){
-            Controleur.deleteMateriel(id);
-            unTableau.setDonnees(obtenirDonnees(""));
-            vider();
+            // Sécurité : On vérifie que la liste n'est pas nulle avant de boucler
+            if (lesMateriels != null) {
+                for (Materiel unMat : lesMateriels) {
+                    Object[] ligne = {
+                        unMat.getId_mat(),
+                        unMat.getLibelle_mat(),
+                        unMat.getType_mat(),
+                        unMat.getEtat(),
+                        unMat.getPrix_jour()
+                    };
+                    modelTable.addRow(ligne);
+                }
+            }
+        } catch (Exception ex) {
+            System.out.println("Erreur lors du chargement du tableau : " + ex.getMessage());
         }
     }
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == btAnnuler) {
+            tfLibelle.setText("");
+            tfPrix.setText("");
+            cbType.setSelectedIndex(0);
+            cbEtat.setSelectedIndex(0);
+        } 
+        else if (e.getSource() == btValider) {
+            String libelle = tfLibelle.getText();
+            String typeMat = cbType.getSelectedItem().toString();
+            String etat = cbEtat.getSelectedItem().toString();
+            String prixStr = tfPrix.getText();
 
-	public static void remplirIdMat() {
-	 //remplir le combo box de materiel
-		ArrayList<Materiel> lesMateriels=Controleur .selectAllMateriels("");
-		txtMat.removeAllItems();
-		for(Materiel  unMateriel :lesMateriels) {
-			txtMat.addItem(unMateriel.getId_mat()+"-"+unMateriel.getLibelle_mat());
-		}
-		
-	}
+            if (libelle.isEmpty() || prixStr.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Veuillez remplir tous les champs !");
+            } else {
+                try {
+                    // CORRECTION 1 : Ton modèle attend un 'float' pour le prix, pas un 'double'
+                    float prix = Float.parseFloat(prixStr);
+                    
+                    // CORRECTION 2 : L'ordre exact de ton constructeur -> (libelle, typeMat, etat, prix, id)
+                    Materiel unMateriel = new Materiel(libelle, typeMat, etat, prix, 0);                    
+                    
+                    // Envoi à la base de données
+                    Controleur.insertMateriel(unMateriel);
+                    
+                    JOptionPane.showMessageDialog(this, "Matériel ajouté avec succès !");
+                    
+                    // Rafraîchissement automatique du tableau
+                    remplirTableau(); 
+                    
+                    // Nettoyage des champs de saisie
+                    tfLibelle.setText("");
+                    tfPrix.setText("");
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(this, "Le prix doit être un nombre valide !");
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, "Erreur lors de l'insertion : " + ex.getMessage());
+                }
+            }
+        }
+    }
 }

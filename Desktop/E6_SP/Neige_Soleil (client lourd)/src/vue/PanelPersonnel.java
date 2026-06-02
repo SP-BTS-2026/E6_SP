@@ -15,7 +15,7 @@ public class PanelPersonnel extends PanelPrincipal implements ActionListener {
 
     private JTextField txtNom = new JTextField();
     private JTextField txtPrenom = new JTextField();
-    private JTextField txtEmail = new JTextField();
+    // CORRECTION : txtEmail a été supprimé ici
     private JTextField txtTel = new JTextField();
     private JTextField txtRole = new JTextField();
 
@@ -45,9 +45,10 @@ public class PanelPersonnel extends PanelPrincipal implements ActionListener {
         add(panelFiltre);
 
         // Panel formulaire
-        panelForm.setBounds(50,100,300,350);
+        panelForm.setBounds(50, 100, 300, 350);
         panelForm.setBackground(Color.gray);
-        panelForm.setLayout(new GridLayout(9,2,10,10));
+        // CORRECTION : Passé de 9 à 8 lignes dans le GridLayout
+        panelForm.setLayout(new GridLayout(8, 2, 10, 10));
 
         panelForm.add(new JLabel("Nom :"));
         panelForm.add(txtNom);
@@ -55,8 +56,7 @@ public class PanelPersonnel extends PanelPrincipal implements ActionListener {
         panelForm.add(new JLabel("Prénom :"));
         panelForm.add(txtPrenom);
 
-        panelForm.add(new JLabel("Email :"));
-        panelForm.add(txtEmail);
+        // CORRECTION : L'affichage du JLabel et du JTextField Email a été retiré ici
 
         panelForm.add(new JLabel("Téléphone :"));
         panelForm.add(txtTel);
@@ -82,7 +82,8 @@ public class PanelPersonnel extends PanelPrincipal implements ActionListener {
         txtFiltre.addActionListener(this);
 
         // Table
-        String entetes[] = {"ID", "Nom", "Prénom", "Email", "Téléphone", "Rôle"};
+        // CORRECTION : "Email" retiré des entêtes
+        String entetes[] = {"ID", "Nom", "Prénom", "Téléphone", "Rôle"};
         unTableau = new Tableau(obtenirDonnees(""), entetes);
         tablePersonnel = new JTable(unTableau);
 
@@ -96,9 +97,9 @@ public class PanelPersonnel extends PanelPrincipal implements ActionListener {
 
                 txtNom.setText(unTableau.getValueAt(i, 1).toString());
                 txtPrenom.setText(unTableau.getValueAt(i, 2).toString());
-                txtEmail.setText(unTableau.getValueAt(i, 3).toString());
-                txtTel.setText(unTableau.getValueAt(i, 4).toString());
-                txtRole.setText(unTableau.getValueAt(i, 5).toString());
+                // CORRECTION : Indices décalés suite au retrait de l'email
+                txtTel.setText(unTableau.getValueAt(i, 3).toString());
+                txtRole.setText(unTableau.getValueAt(i, 4).toString());
 
                 btModifier.setEnabled(true);
                 btSupprimer.setEnabled(true);
@@ -108,16 +109,17 @@ public class PanelPersonnel extends PanelPrincipal implements ActionListener {
 
     public Object[][] obtenirDonnees(String filtre) {
         ArrayList<Personnel> lesEmployes = Controleur.selectAllPersonnel(filtre);
-        Object[][] mat = new Object[lesEmployes.size()][6];
+        // CORRECTION : Matrice à 5 colonnes au lieu de 6
+        Object[][] mat = new Object[lesEmployes.size()][5];
 
         int i = 0;
         for (Personnel p : lesEmployes) {
             mat[i][0] = p.getId_employe();
             mat[i][1] = p.getNom();
             mat[i][2] = p.getPrenom();
-            mat[i][3] = p.getEmail();
-            mat[i][4] = p.getTel();
-            mat[i][5] = p.getRole();
+            // CORRECTION : On passe directement du prénom au téléphone
+            mat[i][3] = p.getTel();
+            mat[i][4] = p.getRole();
             i++;
         }
         return mat;
@@ -149,7 +151,6 @@ public class PanelPersonnel extends PanelPrincipal implements ActionListener {
     public void vider() {
         txtNom.setText("");
         txtPrenom.setText("");
-        txtEmail.setText("");
         txtTel.setText("");
         txtRole.setText("");
 
@@ -161,16 +162,17 @@ public class PanelPersonnel extends PanelPrincipal implements ActionListener {
 
         String nom = txtNom.getText();
         String prenom = txtPrenom.getText();
-        String email = txtEmail.getText();
         String tel = txtTel.getText();
         String role = txtRole.getText();
 
-        if (nom.equals("") || prenom.equals("") || email.equals("") || tel.equals("") || role.equals("")) {
+        // CORRECTION : Condition de vérification sans l'email
+        if (nom.equals("") || prenom.equals("") || tel.equals("") || role.equals("")) {
             JOptionPane.showMessageDialog(this, "Veuillez remplir tous les champs");
             return;
         }
 
-        Personnel p = new Personnel(nom, prenom, email, tel, role);
+        // CORRECTION : Envoi à l'objet Personnel sans la chaîne email (Met "" ou adapte selon ton constructeur)
+        Personnel p = new Personnel(nom, prenom, "", tel, role);
 
         Controleur.insertPersonnel(p);
         unTableau.setDonnees(obtenirDonnees(""));
@@ -184,11 +186,11 @@ public class PanelPersonnel extends PanelPrincipal implements ActionListener {
 
         String nom = txtNom.getText();
         String prenom = txtPrenom.getText();
-        String email = txtEmail.getText();
         String tel = txtTel.getText();
         String role = txtRole.getText();
 
-        Personnel p = new Personnel(id, nom, prenom, email, tel, role);
+        // CORRECTION : Envoi à l'objet Personnel sans l'email
+        Personnel p = new Personnel(id, nom, prenom, "", tel, role);
 
         Controleur.updatePersonnel(p);
         unTableau.setDonnees(obtenirDonnees(""));

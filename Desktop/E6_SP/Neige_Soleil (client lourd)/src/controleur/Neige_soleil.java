@@ -16,12 +16,16 @@ public class Neige_soleil {
 		uneVueConnexion.setVisible(action);
 	}
 	
-	public static  void creerDetruireVueGenerale(boolean action) {
-		if(action==true) {
-			uneVueGenerale = new VueGenerale();
-		}else {
-			uneVueGenerale.dispose();
-		}
+	// Dans Neige_soleil.java
+	public static void creerDetruireVueGenerale(boolean action, User unUser) {
+	    if (action == true) {
+	        // On passe l'utilisateur au constructeur de VueGenerale
+	        uneVueGenerale = new VueGenerale(unUser); 
+	        uneVueGenerale.setVisible(true);
+	    } else {
+	        if (uneVueGenerale != null) {
+	            uneVueGenerale.dispose();
+	        }
+	    }
 	}
-
 }

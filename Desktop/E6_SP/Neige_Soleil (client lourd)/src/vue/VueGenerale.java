@@ -10,6 +10,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import controleur.Neige_soleil;
+import controleur.User; // Importation de l'objet User
 
 public class VueGenerale extends JFrame implements ActionListener {
 
@@ -22,22 +23,24 @@ public class VueGenerale extends JFrame implements ActionListener {
     private JButton btAppartement = new JButton("Appartements");
     private JButton btReservation = new JButton("Réservation");
     private JButton btMateriel = new JButton("Matériel");
-    private JButton btLouerMat = new JButton("Louer Matériel");
-    private JButton btDisposer = new JButton("Disposer");
+    private JButton btFacture = new JButton("Factures");
     private JButton btPersonnel = new JButton("Personnel");
     private JButton btQuitter = new JButton("Quitter");
 
     // Tous les panels
+    // AJOUT : Déclaration du Panelprofil (on l'instanciera dans le constructeur avec l'user)
+    private Panelprofil panelProfil; 
+    
     private PanelAppartements panelAppart = new PanelAppartements("Appartements");
     private PanelProprietaire panelProprio = new PanelProprietaire("Propriétaires");
     private PanelClient panelClient = new PanelClient("Clients");
     private PanelReservation panelReservation = new PanelReservation("Réservations");
     private PanelMateriels panelMateriel = new PanelMateriels("Matériel");
-    private PanelLouerMateriel panelLouerMat = new PanelLouerMateriel("Location Matériel");
-    private PanelDisposer panelDisposer = new PanelDisposer("Équipements par Appartement");
+    private PanelFacture panelFacture = new PanelFacture("Factures");
     private PanelPersonnel panelPersonnel = new PanelPersonnel("Personnel");
 
-    public VueGenerale() {
+    // MODIFICATION : Le constructeur reçoit maintenant l'utilisateur connecté
+    public VueGenerale(User unUser) {
 
         this.setTitle("Client Lourd Neige & Soleil");
         this.setBounds(100, 10, 1100, 600);
@@ -46,10 +49,13 @@ public class VueGenerale extends JFrame implements ActionListener {
         this.setLayout(null);
         this.getContentPane().setBackground(Color.gray);
 
+        // AJOUT : Instanciation du panel profil avec l'utilisateur connecté
+        this.panelProfil = new Panelprofil("Mon Profil", unUser);
+
         // MENU
         panelMenu.setBounds(40, 20, 1000, 30);
         panelMenu.setBackground(Color.gray);
-        panelMenu.setLayout(new GridLayout(1, 10, 5, 5));
+        panelMenu.setLayout(new GridLayout(1, 9, 5, 5));
 
         panelMenu.add(btProfil);
         panelMenu.add(btProprietaire);
@@ -57,8 +63,7 @@ public class VueGenerale extends JFrame implements ActionListener {
         panelMenu.add(btAppartement);
         panelMenu.add(btReservation);
         panelMenu.add(btMateriel);
-        panelMenu.add(btLouerMat);
-        panelMenu.add(btDisposer);
+        panelMenu.add(btFacture); 
         panelMenu.add(btPersonnel);
         panelMenu.add(btQuitter);
 
@@ -77,8 +82,7 @@ public class VueGenerale extends JFrame implements ActionListener {
         btAppartement.addActionListener(this);
         btReservation.addActionListener(this);
         btMateriel.addActionListener(this);
-        btLouerMat.addActionListener(this);
-        btDisposer.addActionListener(this);
+        btFacture.addActionListener(this); 
         btPersonnel.addActionListener(this);
         btQuitter.addActionListener(this);
 
@@ -97,9 +101,14 @@ public class VueGenerale extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
 
-        if (e.getSource() == btQuitter) {
-            Neige_soleil.rendreVisibleVueConnexion(true);
-            Neige_soleil.creerDetruireVueGenerale(false);
+    	if (e.getSource() == btQuitter) {
+    	    Neige_soleil.rendreVisibleVueConnexion(true);
+    	    // On passe null en deuxième paramètre car on détruit la vue
+    	    Neige_soleil.creerDetruireVueGenerale(false, null); 
+    	}
+        // AJOUT : Gestion du clic sur le bouton Profil
+        else if (e.getSource() == btProfil) {
+            afficherPanel(panelProfil);
         }
         else if (e.getSource() == btAppartement) {
             afficherPanel(panelAppart);
@@ -116,11 +125,8 @@ public class VueGenerale extends JFrame implements ActionListener {
         else if (e.getSource() == btMateriel) {
             afficherPanel(panelMateriel);
         }
-        else if (e.getSource() == btLouerMat) {
-            afficherPanel(panelLouerMat);
-        }
-        else if (e.getSource() == btDisposer) {
-            afficherPanel(panelDisposer);
+        else if (e.getSource() == btFacture) {
+            afficherPanel(panelFacture);
         }
         else if (e.getSource() == btPersonnel) {
             afficherPanel(panelPersonnel);

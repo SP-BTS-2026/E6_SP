@@ -45,25 +45,19 @@ public class PanelAppartements extends PanelPrincipal implements ActionListener 
     public PanelAppartements(String titre) {
         super(titre);
 
-        // panel filtre
-        panelFiltre.setBounds(450,80,460,30);
+        // panel filtre (remonté à Y = 50)
+        panelFiltre.setBounds(450, 50, 460, 30);
         panelFiltre.setBackground(Color.gray);
-        panelFiltre.setLayout(new GridLayout(1,3,10,10));
+        panelFiltre.setLayout(new GridLayout(1, 3, 10, 10));
         panelFiltre.add(new JLabel("Filtrer : "));
         panelFiltre.add(txtFiltre);
         panelFiltre.add(btFiltrer);
         add(panelFiltre);
 
-        // panel formulaire
-        panelForm.setBounds(50, 100, 300, 350);
+        // panel formulaire (remonté à Y = 90, dimensionné pour 9 lignes de saisie)
+        panelForm.setBounds(50, 90, 320, 250);
         panelForm.setBackground(Color.gray);
-        panelForm.setLayout(new GridLayout(10, 2, 10, 10));
-
-        
-        lblImage.setBounds(450, 400, 200, 200);
-        lblImage.setBorder(BorderFactory.createLineBorder(Color.black));
-        add(lblImage);
-
+        panelForm.setLayout(new GridLayout(9, 2, 8, 8));
 
         panelForm.add(new JLabel("Num appart :"));
         panelForm.add(txtNum);
@@ -88,25 +82,30 @@ public class PanelAppartements extends PanelPrincipal implements ActionListener 
 
         panelForm.add(new JLabel("Image :"));
         panelForm.add(txtImage);
-
-
-        
         
         panelForm.add(new JLabel("id_proprietaire :"));
         panelForm.add(txtProprio);
 
-        
-        
+        add(panelForm);
 
-        panelForm.add(btAnnuler);
-        panelForm.add(btValider);
-        panelForm.add(btSupprimer);
-        panelForm.add(btModifier);
+        // panel boutons (placé de manière autonome juste en dessous du formulaire à Y = 355)
+        JPanel panelBoutons = new JPanel();
+        panelBoutons.setBounds(50, 355, 320, 60);
+        panelBoutons.setBackground(Color.gray);
+        panelBoutons.setLayout(new GridLayout(2, 2, 10, 10));
+        panelBoutons.add(btAnnuler);
+        panelBoutons.add(btValider);
+        panelBoutons.add(btSupprimer);
+        panelBoutons.add(btModifier);
+        add(panelBoutons);
+
+        // lblImage (remonté à Y = 355 pour s'aligner horizontalement avec les boutons)
+        lblImage.setBounds(450, 355, 200, 150);
+        lblImage.setBorder(BorderFactory.createLineBorder(Color.black));
+        add(lblImage);
 
         btSupprimer.setEnabled(true);
         btModifier.setEnabled(true);
-
-        add(panelForm);
 
         btAnnuler.addActionListener(this);
         btValider.addActionListener(this);
@@ -120,8 +119,9 @@ public class PanelAppartements extends PanelPrincipal implements ActionListener 
         unTableau = new Tableau(obtenirDonnees(""), entetes);
         tableAppart = new JTable(unTableau);
 
+        // scrollAppart (remonté à Y = 90 pour s'aligner parfaitement avec le formulaire)
         scrollAppart = new JScrollPane(tableAppart);
-        scrollAppart.setBounds(450,120,450,260);
+        scrollAppart.setBounds(450, 90, 450, 250);
         add(scrollAppart);
 
         tableAppart.addMouseListener(new MouseAdapter() {
@@ -138,8 +138,6 @@ public class PanelAppartements extends PanelPrincipal implements ActionListener 
                 txtImage.setText(unTableau.getValueAt(i,8).toString());
                 afficherImage(txtImage.getText());
 
-
-
                 btModifier.setEnabled(true);
                 btSupprimer.setEnabled(true);
             }
@@ -151,7 +149,6 @@ public class PanelAppartements extends PanelPrincipal implements ActionListener 
     public Object[][] obtenirDonnees(String filtre){
         ArrayList<Appartement> lesApparts = Controleur.selectAllAppartements(filtre);
         Object[][] mat = new Object[lesApparts.size()][10];
-;
 
         int i = 0;
         for (Appartement a : lesApparts) {
@@ -166,11 +163,6 @@ public class PanelAppartements extends PanelPrincipal implements ActionListener 
             mat[i][8] = a.getImage();
             mat[i][9] = a.getIdproprio();
             i++;
-
-            
-           
-            
-           
         }
         return mat;
     }
@@ -209,36 +201,42 @@ public class PanelAppartements extends PanelPrincipal implements ActionListener 
         txtImage.setText("");
         lblImage.setIcon(null);
 
-       
         btModifier.setEnabled(false);
         btSupprimer.setEnabled(false);
-        
     }
 
     public void insertAppartement(){
 
-        if(txtNum.getText().equals("") || txtType.getText().equals("") || txtSurface.getText().equals("")|| txtPrix.getText().equals("") || lblImage.getText().equals("") 
-        		){
-            JOptionPane.showMessageDialog(this,"Veuillez remplir tous les champs");
+        if(txtNum.getText().equals("") || txtType.getText().equals("") || 
+           txtSurface.getText().equals("") || txtExpo.getText().equals("") || 
+           txtDistance.getText().equals("") || txtCapacite.getText().equals("") || 
+           txtPrix.getText().equals("") || txtImage.getText().equals("") || 
+           txtProprio.getSelectedItem() == null){
+            
+            JOptionPane.showMessageDialog(this, "Veuillez remplir tous les champs");
             return;
         }
 
-        Appartement a = new Appartement(
-                txtNum.getText(),
-                txtType.getText(),
-                Float.parseFloat(txtSurface.getText()),
-                Integer.parseInt(txtCapacite.getText()),
-                txtExpo.getText(),
-                Integer.parseInt(txtDistance.getText()),
-                Float.parseFloat(txtPrix.getText()),
-                txtImage.getText(),
-                Integer.parseInt(txtProprio.getSelectedItem().toString().split("-")[0])
-        );
+        try {
+            Appartement a = new Appartement(
+                    txtNum.getText(),
+                    txtType.getText(),
+                    Float.parseFloat(txtSurface.getText()),
+                    Integer.parseInt(txtCapacite.getText()),
+                    txtExpo.getText(),
+                    Integer.parseInt(txtDistance.getText()),
+                    Float.parseFloat(txtPrix.getText()),
+                    txtImage.getText(),
+                    Integer.parseInt(txtProprio.getSelectedItem().toString().split("-")[0])
+            );
 
-
-        Controleur.insertAppartement(a);
-        unTableau.setDonnees(obtenirDonnees(""));
-        vider();
+            Controleur.insertAppartement(a);
+            unTableau.setDonnees(obtenirDonnees(""));
+            vider();
+            
+        } catch (NumberFormatException nfe) {
+            JOptionPane.showMessageDialog(this, "Erreur : La surface, la capacité, la distance et le prix doivent être des nombres.");
+        }
     }
 
     public void afficherImage(String nomImage) {
@@ -249,11 +247,7 @@ public class PanelAppartements extends PanelPrincipal implements ActionListener 
         } catch (Exception e) {
             lblImage.setIcon(null);
         }
-        
-        
     }
-
-    
 
     public void updateAppartement(){
 
@@ -272,7 +266,6 @@ public class PanelAppartements extends PanelPrincipal implements ActionListener 
                 txtImage.getText(),
                 Integer.parseInt(txtProprio.getSelectedItem().toString().split("-")[0])
         );
-
 
         Controleur.updateAppartement(a);
         unTableau.setDonnees(obtenirDonnees(""));
@@ -293,13 +286,11 @@ public class PanelAppartements extends PanelPrincipal implements ActionListener 
         }
     }
 
-	public static void remplirIdProprio() {
-	 //remplir le combo box de proprio
-		ArrayList<Proprietaire> lesProprios=Controleur .selectAllProprietaires("");
-		txtProprio.removeAllItems();
-		for(Proprietaire  unProprio :lesProprios) {
-			txtProprio.addItem(unProprio.getIdProprio()+"-"+unProprio.getNom());
-		}
-		
-	}
+    public static void remplirIdProprio() {
+        ArrayList<Proprietaire> lesProprios=Controleur .selectAllProprietaires("");
+        txtProprio.removeAllItems();
+        for(Proprietaire  unProprio :lesProprios) {
+            txtProprio.addItem(unProprio.getIdProprio()+"-"+unProprio.getNom());
+        }
+    }
 }

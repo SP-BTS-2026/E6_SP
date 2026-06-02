@@ -22,7 +22,7 @@ public abstract class PanelPrincipal extends JPanel
 		lbTitre.setBounds(340,10,400,20);
 		this.add(lbTitre);
 		
-		this.setVisible(false);
+		this.setVisible(true);
 		
 	}
 

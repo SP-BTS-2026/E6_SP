@@ -73,6 +73,16 @@ public void setTel(String tel) {
 	this.tel = tel;
 }
 
+public String getId_perso() {
+	// TODO Auto-generated method stub
+	return null;
+}
+
+public String getRole() {
+	// TODO Auto-generated method stub
+	return null;
+}
+
 
 	
 	
