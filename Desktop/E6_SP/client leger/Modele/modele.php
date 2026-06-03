@@ -233,5 +233,21 @@ public function getStatistiques() {
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+/* ==========================================================
+   SECTION : MATERIEL
+   ========================================================== */
+
+public function getTousLesMateriels() {
+    $stmt = $this->pdo->prepare("SELECT * FROM Materiel WHERE etat != 'Hors service'");
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+public function louerMateriel($id_client, $id_mat, $date_debut, $date_fin) {
+    $sql = "INSERT INTO Louer_Materiel (date_debut, date_fin, id_client, id_mat)
+            VALUES (?, ?, ?, ?)";
+    $stmt = $this->pdo->prepare($sql);
+    return $stmt->execute([$date_debut, $date_fin, $id_client, $id_mat]);
+}
 }
 ?>

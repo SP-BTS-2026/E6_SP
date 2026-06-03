@@ -117,5 +117,16 @@ public function ajouterContrat($data) {
 public function getStatistiques() {
     return $this->unModele->getStatistiques();
 }
+/* ==========================================================
+   SECTION : MATERIEL
+   ========================================================== */
+
+public function getTousLesMateriels() {
+    return $this->unModele->getTousLesMateriels();
+}
+
+public function louerMateriel($id_client, $id_mat, $date_debut, $date_fin) {
+    return $this->unModele->louerMateriel($id_client, $id_mat, $date_debut, $date_fin);
+}
     }
 ?>

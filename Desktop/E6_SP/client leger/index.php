@@ -151,6 +151,25 @@ case 'ajout_contrat':
         exit();
     }
     break;
+
+    case 'materiel':
+    $lesMateriels = $unControleur->getTousLesMateriels();
+    break;
+
+case 'louer_materiel':
+    if(!isset($_SESSION['id_user'])) { header('Location: index.php?page=connexion'); exit(); }
+    if($_SESSION['role'] != 'client') { header('Location: index.php?page=accueil'); exit(); }
+    if(isset($_POST['btnLouer'])) {
+        $unControleur->louerMateriel(
+            $_SESSION['id_user'],
+            $_POST['id_mat'],
+            $_POST['date_debut'],
+            $_POST['date_fin']
+        );
+        header('Location: index.php?page=materiel&success=loue');
+        exit();
+    }
+    break;
     case 'stats':
     $stats = $unControleur->getStatistiques();
     break;
