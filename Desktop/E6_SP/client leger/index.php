@@ -130,6 +130,31 @@ case 'ajout_appart':
     }
     break;
 
+    case 'mes_contrats':
+    if(!isset($_SESSION['id_user'])) { header('Location: index.php?page=connexion'); exit(); }
+    $mesContrats = $unControleur->getContratsByProprio($_SESSION['id_user']);
+    $mesApparts  = $unControleur->getAppartsByProprio($_SESSION['id_user']);
+    break;
+
+case 'ajout_contrat':
+    if(!isset($_SESSION['id_user'])) { header('Location: index.php?page=connexion'); exit(); }
+    $mesApparts = $unControleur->getAppartsByProprio($_SESSION['id_user']);
+    if(isset($_POST['btnAjoutContrat'])) {
+        $data = [
+            'date_debut'   => $_POST['date_debut'],
+            'date_fin'     => $_POST['date_fin'],
+            'tarif_saison' => $_POST['tarif_saison'],
+            'id_appart'    => $_POST['id_appart']
+        ];
+        $unControleur->ajouterContrat($data);
+        header('Location: index.php?page=mes_contrats&success=ajout');
+        exit();
+    }
+    break;
+    case 'stats':
+    $stats = $unControleur->getStatistiques();
+    break;
+
 case 'suppr_appart':
     if(!isset($_SESSION['id_user'])) { header('Location: index.php?page=connexion'); exit(); }
     $unControleur->supprimerAppartement($_GET['id'], $_SESSION['id_user']);

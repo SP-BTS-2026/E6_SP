@@ -125,6 +125,17 @@ CREATE TABLE LOUER_MATERIEL (
     FOREIGN KEY (id_client) REFERENCES CLIENT(id_client),
     FOREIGN KEY (id_mat) REFERENCES MATERIEL(id_mat)
 );
+-- 13. Table Facture 
+CREATE TABLE FACTURE (
+    id_facture INT AUTO_INCREMENT PRIMARY KEY,
+    num_facture VARCHAR(50) UNIQUE,
+    date_emission DATETIME DEFAULT CURRENT_TIMESTAMP,
+    montant_ttc DECIMAL(10,2),
+    id_reser INT UNIQUE,
+    FOREIGN KEY (id_reser)
+        REFERENCES RESERVATION(id_reser)
+        ON DELETE CASCADE
+);
 
 -- les triggers 
 DROP TRIGGER IF EXISTS insert_client;
@@ -226,3 +237,7 @@ VALUES
 ('A108', 'T3', 55.00, 5, 1, '8.jpg'),
 ('A109', 'Chalet', 90.00, 8, 1, '9.jpg'),
 ('A110', 'Appartement', 40.00, 4, 1, '10.jpg');
+
+
+ALTER TABLE RESERVATION
+ADD statut VARCHAR(20) DEFAULT 'panier';

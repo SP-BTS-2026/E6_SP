@@ -54,15 +54,19 @@
                     <input type="date" name="date_fin" required min="<?= date('Y-m-d') ?>">
                 </div>
 
-                <?php if(isset($_SESSION['id_user'])): ?>
-                    <button type="submit" name="btnReserver" class="btn-reserve">
-                        <i class="fas fa-shopping-cart"></i> Ajouter au panier
-                    </button>
-                <?php else: ?>
-                    <a href="index.php?page=connexion" class="btn-warn" style="display:block; text-align:center; text-decoration:none; background: #e67e22; color: white; padding: 12px; border-radius: 5px;">
-                        Connectez-vous pour réserver
-                    </a>
-                <?php endif; ?>
+                <?php if(isset($_SESSION['id_user']) && $_SESSION['role'] == 'client'): ?>
+    <button type="submit" name="btnReserver" class="btn-reserve">
+        <i class="fas fa-shopping-cart"></i> Ajouter au panier
+    </button>
+<?php elseif(isset($_SESSION['id_user']) && $_SESSION['role'] == 'proprietaire'): ?>
+    <p style="color:#e74c3c; background:#fdf0f0; padding:12px; border-radius:8px; text-align:center;">
+        <i class="fas fa-info-circle"></i> Les propriétaires ne peuvent pas effectuer de réservation.
+    </p>
+<?php else: ?>
+    <a href="index.php?page=connexion" class="btn-warn" style="display:block; text-align:center; text-decoration:none; background: #e67e22; color: white; padding: 12px; border-radius: 5px;">
+        Connectez-vous pour réserver
+    </a>
+<?php endif; ?>
             </form>
         </div>
     </div>

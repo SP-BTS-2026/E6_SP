@@ -19,10 +19,12 @@ class Modele {
     }
  
     public function getTousLesAppartements() {
-        $stmt = $this->pdo->prepare("SELECT * FROM APPARTEMENT");
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+    $stmt = $this->pdo->prepare("SELECT a.* FROM APPARTEMENT a
+        INNER JOIN CONTRAT c ON a.id_appart = c.id_appart
+        WHERE c.statut_archive = 0");
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
  
     public function getAppartementById($id) {
         $stmt = $this->pdo->prepare("SELECT * FROM APPARTEMENT WHERE id_appart = ?");
@@ -193,6 +195,43 @@ public function supprimerAppartement($id_appart, $id_proprio) {
     $sql  = "DELETE FROM APPARTEMENT WHERE id_appart = ? AND id_proprio = ?";
     $stmt = $this->pdo->prepare($sql);
     return $stmt->execute([$id_appart, $id_proprio]);
+}
+public function getContratsByProprio($id_proprio) {
+    $sql = "SELECT c.*, a.num_appart, a.type_appart 
+            FROM CONTRAT c
+            JOIN APPARTEMENT a ON c.id_appart = a.id_appart
+            WHERE a.id_proprio = ?
+            ORDER BY c.date_debut DESC";
+    $stmt = $this->pdo->prepare($sql);
+    $stmt->execute([$id_proprio]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+public function ajouterContrat($data) {
+    $sql = "INSERT INTO CONTRAT (date_debut, date_fin, tarif_saison, id_appart)
+            VALUES (?, ?, ?, ?)";
+    $stmt = $this->pdo->prepare($sql);
+    return $stmt->execute([
+        $data['date_debut'],
+        $data['date_fin'],
+        $data['tarif_saison'],
+        $data['id_appart']
+    ]);
+}
+public function getStatistiques() {
+    $sql = "SELECT 
+                a.type_appart,
+                COUNT(a.id_appart) AS nb_apparts,
+                MIN(a.prix_hebdo) AS prix_min,
+                MAX(a.prix_hebdo) AS prix_max,
+                AVG(a.prix_hebdo) AS prix_moyen
+            FROM APPARTEMENT a
+            INNER JOIN CONTRAT c ON a.id_appart = c.id_appart
+            WHERE c.statut_archive = 0
+            GROUP BY a.type_appart";
+    $stmt = $this->pdo->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 }
 ?>

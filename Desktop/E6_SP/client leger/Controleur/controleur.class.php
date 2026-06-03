@@ -99,5 +99,23 @@ class Controleur {
     public function getFacture($id_reser) {
         return $this->unModele->getFactureByReser($id_reser);
     }
+    /* ==========================================================
+   SECTION : GESTION DES CONTRATS
+   ========================================================== */
+
+public function getContratsByProprio($id_proprio) {
+    return $this->unModele->getContratsByProprio($id_proprio);
+}
+
+public function ajouterContrat($data) {
+    return $this->unModele->ajouterContrat($data);
+}
+/* ==========================================================
+   SECTION : STATISTIQUES
+   ========================================================== */
+
+public function getStatistiques() {
+    return $this->unModele->getStatistiques();
+}
     }
 ?>
